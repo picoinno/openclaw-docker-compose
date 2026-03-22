@@ -73,9 +73,43 @@ docker compose logs openclaw-gateway --tail 20
 docker compose exec tailscale tailscale status
 ```
 
-### 5. Talk to your bot
+### 5. Pair your Telegram account
 
-Open Telegram and message your bot. It should respond!
+When you message the bot for the first time, it will send you a **pairing code**. This is a security feature — only approved users can chat with the bot.
+
+To approve the pairing:
+
+```bash
+docker compose run --rm openclaw-cli pairing approve telegram <YourCode>
+```
+
+Replace `<YourCode>` with the code the bot sent you.
+
+To allow additional users, they message the bot, receive a code, and you approve it the same way.
+
+To see all pending pairing requests:
+
+```bash
+docker compose run --rm openclaw-cli devices list
+```
+
+To allow a user directly by their Telegram ID (skip pairing):
+
+Edit `data/.openclaw/openclaw.json` and add their ID to `allowFrom`:
+
+```json
+{
+  "channels": {
+    "telegram": {
+      "allowFrom": ["123456789"]
+    }
+  }
+}
+```
+
+Then restart: `docker compose restart openclaw-gateway`
+
+After pairing, message your bot — it should respond!
 
 ## Directory Structure
 
