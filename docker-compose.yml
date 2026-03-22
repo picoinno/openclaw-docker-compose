@@ -1,0 +1,57 @@
+services:
+  # --- NETWORK LAYER ---
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: openclaw-vpn
+    hostname: openclaw-agent
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATEFUL_CONFIG=false
+    volumes:
+      - ./tailscale:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    restart: unless-stopped
+
+  # --- CORE ENGINE ---
+  openclaw-gateway:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-gateway
+    restart: unless-stopped
+    # This container shares the Tailscale network stack
+    network_mode: "service:tailscale"
+    volumes:
+      - ./data/.openclaw:/home/node/.openclaw
+      - ./data/workspace:/home/node/.openclaw/workspace
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_TOKEN}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - BROWSER_WS_ENDPOINT=ws://localhost:3000
+      - NODE_ENV=production
+    depends_on:
+      - tailscale
+      - openclaw-browser
+
+  # --- BROWSER ENGINE ---
+  openclaw-browser:
+    image: browserless/chrome:latest
+    container_name: openclaw-browser
+    restart: unless-stopped
+    # Shares Tailscale network so gateway can reach port 3000 on localhost
+    network_mode: "service:tailscale"
+    environment:
+      - MAX_CONCURRENT_SESSIONS=3
+      - CONNECTION_TIMEOUT=300000
+
+  # --- MANAGEMENT TOOL ---
+  openclaw-cli:
+    image: ghcr.io/openclaw/openclaw:latest
+    container_name: openclaw-cli
+    volumes:
+      - ./data/.openclaw:/home/node/.openclaw
+    entrypoint: ["node", "dist/index.js"]
+    profiles: ["tools"]
