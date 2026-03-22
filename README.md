@@ -92,6 +92,7 @@ openclaw-docker-compose/
 │   └── setup-guide.md       # Detailed setup instructions
 └── scripts/
     ├── setup.sh             # First-time setup wizard
+    ├── switch-provider.sh   # Change AI provider interactively
     └── backup.sh            # Backup data directory
 ```
 
@@ -131,6 +132,19 @@ docker compose run --rm openclaw-cli devices list
 docker compose pull       # Pull latest images
 docker compose up -d      # Recreate with new images
 ```
+
+### Switch AI Provider
+
+```bash
+./scripts/switch-provider.sh
+```
+
+Interactively switch between Anthropic, OpenAI, OpenRouter, Ollama, Gemini, Groq, or Mistral. Updates `.env` and `openclaw.json` automatically.
+
+Or switch manually:
+1. Edit `.env` — update the API key
+2. Edit `data/.openclaw/openclaw.json` — change `agents.defaults.model` (e.g. `openai/gpt-4o`)
+3. `docker compose restart openclaw-gateway`
 
 ### Backup
 
