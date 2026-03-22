@@ -29,8 +29,9 @@ services:
     environment:
       # --- Required ---
       - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_TOKEN}
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY} ### Or use any other LLM provider key from the list below
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      # --- AI Provider (at least one required) ---
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
       - BROWSER_WS_ENDPOINT=ws://localhost:3000
       - NODE_ENV=production
       # --- Optional: AI Providers ---
