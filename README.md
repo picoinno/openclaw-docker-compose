@@ -43,8 +43,8 @@ All services share the Tailscale network stack, so they see each other on `local
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/openclaw-stack.git
-cd openclaw-stack
+git clone https://github.com/picoinno/openclaw-docker-compose.git
+cd openclaw-docker-compose
 ```
 
 ### 2. Configure environment
@@ -80,7 +80,7 @@ Open Telegram and message your bot. It should respond!
 ## Directory Structure
 
 ```
-openclaw-stack/
+openclaw-docker-compose/
 ├── docker-compose.yml       # Container orchestration
 ├── .env                     # Your secrets (gitignored)
 ├── .env.example             # Template for .env
