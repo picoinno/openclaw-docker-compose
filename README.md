@@ -78,7 +78,21 @@ nano .env    # Fill in your actual values
 docker compose up -d
 ```
 
-### 4. Verify
+### 4. Set your AI model
+
+The gateway defaults to Anthropic Claude. If you're using a different provider (OpenAI, etc.), run this after first boot:
+
+```bash
+./scripts/init-config.sh openai/gpt-4o
+```
+
+Or set `AI_MODEL` in your `.env` and run `./scripts/init-config.sh` without arguments.
+
+Common models: `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4o`, `openai/gpt-4o-mini`, `ollama/llama3`
+
+> **Why?** OpenClaw stores the model in `openclaw.json`, not `.env`. This script bridges the gap so you only edit `.env`.
+
+### 5. Verify
 
 ```bash
 # Check all containers are running
@@ -161,6 +175,7 @@ openclaw-docker-compose/
 │   └── setup-guide.md       # Detailed setup instructions
 └── scripts/
     ├── setup.sh             # First-time setup wizard
+    ├── init-config.sh       # Set AI model after first boot
     ├── switch-provider.sh   # Change AI provider interactively
     └── backup.sh            # Backup data directory
 ```
