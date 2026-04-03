@@ -31,7 +31,16 @@ This folder is home.
 
 ## Subagents
 
-_(Optional — add subagent personas in `agents/` and list them here)_
+Persona files in `agents/`, skills in `skills/`.
+
+| Agent | Role | Model |
+|---|---|---|
+| Koda 💻 | Coding — builds, reviews, debugs | Sonnet |
+| Docu 📝 | Docs — writing, organizing | Sonnet |
+| Sentry 🛡️ | Security — audits, hardening | Opus |
+| Nexus 🔮 | Deep thinking — research, reasoning, analysis | Opus |
+
+Add more by creating files in `agents/` and listing them here.
 
 ## Platform Notes
 

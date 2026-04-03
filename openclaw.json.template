@@ -67,7 +67,8 @@
       "github": { "enabled": true },
       "coding-agent": { "enabled": true },
       "summarize": { "enabled": true },
-      "session-logs": { "enabled": true }
+      "session-logs": { "enabled": true },
+      "deep-dive": { "enabled": true }
     }
   }
 }
