@@ -92,7 +92,7 @@ nano .env
 ```
 
 ```env
-TS_AUTHKEY=tskey-auth-kYoUrAcTuAlKeY-xxxxxxxxxxxxxxxxxxxxxxx
+TS_AUTHKEY=tskey-auth-xxxxxxxxx
 OPENCLAW_TOKEN=a-strong-random-string-use-openssl-rand-hex-32
 ANTHROPIC_API_KEY=sk-ant-your-actual-key-here
 TELEGRAM_BOT_TOKEN=<your-bot-token>

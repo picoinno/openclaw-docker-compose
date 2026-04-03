@@ -242,8 +242,8 @@ Run `./scripts/init-config.sh` after first boot to apply the template.
 If you want the agent to push/pull GitHub repos, add your PAT tokens to `.env`:
 
 ```env
-GITHUB_TOKEN_PICOINNO=github_pat_xxxxxxxxx
-GITHUB_TOKEN_PICO_INNO=github_pat_xxxxxxxxx
+GITHUB_TOKEN_1=github_pat_xxxxxxxxx
+GITHUB_TOKEN_2=github_pat_xxxxxxxxx
 ```
 
 Then wire them into the container after first boot:
