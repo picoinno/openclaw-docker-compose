@@ -1,0 +1,9 @@
+# Exclude from workspace context scanning
+.git/
+node_modules/
+dist/
+build/
+*.log
+*.tmp
+*.sqlite
+media/

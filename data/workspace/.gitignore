@@ -1,0 +1,12 @@
+# Memory files — personal, don't commit
+memory/
+*.sqlite
+
+# Secrets & credentials
+config/
+*.json
+!workspace-state.json
+
+# OS
+.DS_Store
+Thumbs.db

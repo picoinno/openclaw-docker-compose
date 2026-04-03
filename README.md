@@ -164,21 +164,78 @@ After pairing is approved, message your bot — it should respond!
 
 ```
 openclaw-docker-compose/
-├── docker-compose.yml       # Container orchestration
-├── .env                     # Your secrets (gitignored)
-├── .env.example             # Template for .env
-├── data/                    # Runtime data (gitignored)
-│   ├── .openclaw/           # Gateway config, sessions, credentials
-│   └── workspace/           # AI workspace (SOUL.md, memory, skills)
-├── tailscale/               # Tailscale state (gitignored)
+├── docker-compose.yml            # Container orchestration
+├── openclaw.json.template        # Optimized gateway config template
+├── .env                          # Your secrets (gitignored)
+├── .env.example                  # Template for .env
+├── data/                         # Runtime data (gitignored)
+│   ├── .openclaw/                # Gateway config, sessions, credentials
+│   └── workspace/                # AI workspace (persona, memory, skills)
+│       ├── SOUL.md               # Agent personality & behavior
+│       ├── IDENTITY.md           # Agent name, avatar, vibe
+│       ├── USER.md               # About the human — fill this in
+│       ├── AGENTS.md             # Startup instructions & rules
+│       ├── HEARTBEAT.md          # Background check schedule
+│       ├── TOOLS.md              # Environment-specific notes
+│       ├── MEMORY.md             # Long-term memory (curated)
+│       ├── agents/               # Subagent persona files
+│       │   ├── koda.md           # Coding subagent
+│       │   ├── docu.md           # Documentation subagent
+│       │   └── sentry.md         # Security subagent
+│       └── memory/               # Daily notes + archive
+│           └── archive/
+├── tailscale/                    # Tailscale state (gitignored)
 ├── docs/
-│   └── setup-guide.md       # Detailed setup instructions
+│   └── setup-guide.md            # Detailed setup instructions
 └── scripts/
-    ├── setup.sh             # First-time setup wizard
-    ├── init-config.sh       # Set AI model after first boot
-    ├── switch-provider.sh   # Change AI provider interactively
-    └── backup.sh            # Backup data directory
+    ├── setup.sh                  # First-time setup wizard
+    ├── init-config.sh            # Apply config template + set AI model
+    ├── switch-provider.sh        # Change AI provider interactively
+    └── backup.sh                 # Backup data directory
 ```
+
+## Workspace
+
+The `data/workspace/` directory is the agent's brain. It ships with starter files:
+
+| File | Purpose | Edit? |
+|------|---------|-------|
+| `SOUL.md` | Personality, behavior, values | ✅ Customize |
+| `IDENTITY.md` | Name, emoji, vibe | ✅ Customize |
+| `USER.md` | About you — name, timezone, context | ✅ Fill in |
+| `AGENTS.md` | Startup rules, red lines, workspace rules | Optional |
+| `HEARTBEAT.md` | What to check on background ticks | Optional |
+| `TOOLS.md` | Your local setup (SSH hosts, device names, etc.) | ✅ Add entries |
+| `MEMORY.md` | Long-term memory — curated by the agent | Auto-managed |
+
+**Projects rule:** never put git repos inside `workspace/`. The agent uses
+`/home/node/projects/` for code. The workspace is for memory and config only.
+Keeping repos out of the workspace prevents accidental context bloat.
+
+### Subagents
+
+Three starter subagents are included in `data/workspace/agents/`:
+- **Koda 💻** — coding, debugging, reviews
+- **Docu 📝** — documentation, writing
+- **Sentry 🛡️** — security audits, hardening
+
+Add more by creating files in `agents/` and listing them in `AGENTS.md`.
+
+## Token Optimization
+
+This stack ships with an optimized `openclaw.json.template` that enables:
+
+| Setting | Value | Effect |
+|---------|-------|--------|
+| `contextPruning` | cache-ttl 5m | Drops old tool results from context |
+| `imageMaxDimensionPx` | 800 | Downscales images before sending to model |
+| `compaction` | safeguard + memoryFlush | Auto-compacts long sessions, saves memory |
+| `session.reset` | daily at 4am | Fresh session every morning |
+| `session.maintenance` | 30d prune / 200mb cap | Keeps disk usage in check |
+| `messages.queue` | collect, 2s debounce | Batches rapid messages |
+| `heartbeat` | 55m, lightContext | Keeps context cache warm cheaply |
+
+Run `./scripts/init-config.sh` after first boot to apply the template.
 
 ## Management
 

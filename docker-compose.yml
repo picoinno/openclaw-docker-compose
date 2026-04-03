@@ -1,7 +1,7 @@
 services:
   # --- NETWORK LAYER ---
   tailscale:
-    image: tailscale/tailscale:latest
+    image: tailscale/tailscale:v1.82.5
     container_name: openclaw-vpn
     hostname: ${TS_HOSTNAME:-openclaw-agent}
     environment:
@@ -14,14 +14,33 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "tailscale", "status", "--json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 256m
+          cpus: "0.5"
 
   # --- CORE ENGINE ---
   openclaw-gateway:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-gateway
     restart: unless-stopped
-    # This container shares the Tailscale network stack
+    stop_grace_period: 30s
+    # Shares the Tailscale network stack
     network_mode: "service:tailscale"
+    security_opt:
+      - no-new-privileges:true
     volumes:
       - ./data/.openclaw:/home/node/.openclaw
       - ./data/workspace:/home/node/.openclaw/workspace
@@ -65,26 +84,71 @@ services:
       # --- Optional: Gateway ---
       - OPENCLAW_LOG_LEVEL=${OPENCLAW_LOG_LEVEL:-info}
     depends_on:
-      - tailscale
-      - openclaw-browser
-
+      tailscale:
+        condition: service_healthy
+      openclaw-browser:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:18789/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+          cpus: "2"
 
   # --- BROWSER ENGINE ---
   openclaw-browser:
-    image: browserless/chrome:latest
+    image: browserless/chrome:v2.25.2
     container_name: openclaw-browser
     restart: unless-stopped
     # Shares Tailscale network so gateway can reach port 3000 on localhost
     network_mode: "service:tailscale"
+    security_opt:
+      - no-new-privileges:true
     environment:
       - MAX_CONCURRENT_SESSIONS=3
       - CONNECTION_TIMEOUT=300000
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/json/version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+          cpus: "1"
 
   # --- MANAGEMENT TOOL ---
   openclaw-cli:
     image: ghcr.io/openclaw/openclaw:latest
     container_name: openclaw-cli
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+      - NET_ADMIN
     volumes:
       - ./data/.openclaw:/home/node/.openclaw
     entrypoint: ["node", "dist/index.js"]
     profiles: ["tools"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"

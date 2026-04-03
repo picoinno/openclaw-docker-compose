@@ -1,0 +1,73 @@
+{
+  "agents": {
+    "defaults": {
+      "model": {
+        "primary": "__AI_MODEL__",
+        "fallbacks": [
+          "anthropic/claude-opus-4-6",
+          "openai/gpt-4.1",
+          "openrouter/google/gemini-2.5-pro",
+          "openrouter/qwen/qwen3.5-35b-a3b"
+        ]
+      },
+      "compaction": {
+        "mode": "safeguard",
+        "memoryFlush": {
+          "enabled": true
+        }
+      },
+      "contextPruning": {
+        "mode": "cache-ttl",
+        "ttl": "5m"
+      },
+      "heartbeat": {
+        "every": "55m",
+        "lightContext": true,
+        "target": "telegram"
+      },
+      "imageMaxDimensionPx": 800,
+      "maxConcurrent": 4,
+      "subagents": {
+        "maxConcurrent": 8
+      }
+    }
+  },
+  "session": {
+    "reset": {
+      "mode": "daily",
+      "atHour": 4
+    },
+    "maintenance": {
+      "mode": "enforce",
+      "pruneAfter": "30d",
+      "maxDiskBytes": "200mb"
+    }
+  },
+  "messages": {
+    "ackReactionScope": "group-mentions",
+    "queue": {
+      "mode": "collect",
+      "debounceMs": 2000
+    }
+  },
+  "commands": {
+    "native": "auto",
+    "nativeSkills": "auto",
+    "restart": true
+  },
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "dmPolicy": "pairing",
+      "streaming": "partial"
+    }
+  },
+  "skills": {
+    "entries": {
+      "github": { "enabled": true },
+      "coding-agent": { "enabled": true },
+      "summarize": { "enabled": true },
+      "session-logs": { "enabled": true }
+    }
+  }
+}

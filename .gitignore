@@ -1,0 +1,27 @@
+# Runtime data — never commit
+data/.openclaw/
+data/workspace/memory/
+data/workspace/config/
+data/workspace/.openclaw/
+
+# Tailscale state
+tailscale/*.txt
+tailscale/*.conf
+tailscale/tailscaled.state
+
+# Backups
+backups/
+
+# Secrets
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
