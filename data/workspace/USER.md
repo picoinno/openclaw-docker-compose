@@ -1,4 +1,6 @@
 # USER.md - About Your Human
+# ⚠️  DO NOT COMMIT after filling in personal details.
+# Add USER.md to your local .gitignore if needed.
 
 - **Name:** _(fill in)_
 - **What to call them:** _(fill in)_

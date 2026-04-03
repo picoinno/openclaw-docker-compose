@@ -1,4 +1,5 @@
 # MEMORY.md — Long-Term Memory
+# ⚠️  DO NOT COMMIT — this file grows to contain personal/business context.
 
 ## Key Facts
 - Agent first boot: _(date)_

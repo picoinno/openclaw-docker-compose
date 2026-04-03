@@ -7,12 +7,15 @@ services:
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_STATEFUL_CONFIG=false
+      # Userspace networking — removes need for NET_ADMIN + /dev/net/tun
+      # Set TS_USERSPACE=false in .env only if you need kernel networking
+      - TS_USERSPACE=${TS_USERSPACE:-true}
     volumes:
       - ./tailscale:/var/lib/tailscale
-      - /dev/net/tun:/dev/net/tun
     cap_add:
       - NET_ADMIN
-      - SYS_MODULE
+    # SYS_MODULE removed — not needed with userspace networking (TS_USERSPACE=true)
+    # NET_ADMIN retained for fallback compatibility; remove if TS_USERSPACE=true works for you
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "tailscale", "status", "--json"]
@@ -31,9 +34,37 @@ services:
           memory: 256m
           cpus: "0.5"
 
+  # --- DOCKER SOCKET PROXY ---
+  # Restricts Docker API access to only what the gateway needs.
+  # Much safer than mounting /var/run/docker.sock directly (which gives full host root).
+  socket-proxy:
+    image: tecnativa/docker-socket-proxy:0.3.0
+    container_name: openclaw-socket-proxy
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      # Allow only what the agent actually needs (containers + exec)
+      - CONTAINERS=1
+      - EXEC=1
+      - IMAGES=1
+      - INFO=1
+      - NETWORKS=0
+      - VOLUMES=0
+      - POST=1
+    networks:
+      - socket-proxy
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
   # --- CORE ENGINE ---
   openclaw-gateway:
-    image: ghcr.io/openclaw/openclaw:latest
+    image: ghcr.io/openclaw/openclaw:2026.3.13
     container_name: openclaw-gateway
     restart: unless-stopped
     stop_grace_period: 30s
@@ -44,14 +75,16 @@ services:
     volumes:
       - ./data/.openclaw:/home/node/.openclaw
       - ./data/workspace:/home/node/.openclaw/workspace
-      - /var/run/docker.sock:/var/run/docker.sock
+      # Docker socket via proxy — not mounted directly
     environment:
       # --- Required ---
       - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_TOKEN}
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       # --- AI Provider (at least one required) ---
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
-      - BROWSER_WS_ENDPOINT=ws://localhost:3000
+      # Docker socket proxy endpoint (replaces direct socket mount)
+      - DOCKER_HOST=tcp://socket-proxy:2375
+      - BROWSER_WS_ENDPOINT=ws://localhost:3000?token=${BROWSER_TOKEN}
       - NODE_ENV=production
       # --- Optional: AI Providers ---
       - OPENAI_API_KEY=${OPENAI_API_KEY:-}
@@ -91,12 +124,16 @@ services:
       - GITHUB_USERNAME_3=${GITHUB_USERNAME_3:-}
       - GITHUB_TOKEN_3=${GITHUB_TOKEN_3:-}
       - GIT_USER_NAME=${GIT_USER_NAME:-OpenClaw Agent}
-      - GIT_USER_EMAIL=${GIT_USER_EMAIL:-agent@openclaw.ai}
+      - GIT_USER_EMAIL=${GIT_USER_EMAIL:-}
+    networks:
+      - socket-proxy
     depends_on:
       tailscale:
         condition: service_healthy
       openclaw-browser:
         condition: service_healthy
+      socket-proxy:
+        condition: service_started
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:18789/healthz"]
       interval: 30s
@@ -126,6 +163,8 @@ services:
     environment:
       - MAX_CONCURRENT_SESSIONS=3
       - CONNECTION_TIMEOUT=300000
+      # Auth token — prevents unauthenticated access on the tailnet
+      - TOKEN=${BROWSER_TOKEN}
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:3000/json/version"]
       interval: 30s
@@ -145,7 +184,7 @@ services:
 
   # --- MANAGEMENT TOOL ---
   openclaw-cli:
-    image: ghcr.io/openclaw/openclaw:latest
+    image: ghcr.io/openclaw/openclaw:2026.3.13
     container_name: openclaw-cli
     security_opt:
       - no-new-privileges:true
@@ -161,3 +200,8 @@ services:
       options:
         max-size: "5m"
         max-file: "2"
+
+networks:
+  socket-proxy:
+    driver: bridge
+    internal: true  # No external access to proxy network

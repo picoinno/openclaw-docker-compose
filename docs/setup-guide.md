@@ -49,7 +49,7 @@ docker compose version
 2. Send `/newbot`
 3. Choose a **display name** (e.g., "My AI Assistant")
 4. Choose a **username** (must end in `bot`, e.g., `mycompany_ai_bot`)
-5. BotFather gives you a token like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`
+5. BotFather gives you a token like: `<your-bot-token>`
 6. Copy this token for `.env`
 
 ### Optional bot settings (via BotFather)
@@ -95,7 +95,7 @@ nano .env
 TS_AUTHKEY=tskey-auth-kYoUrAcTuAlKeY-xxxxxxxxxxxxxxxxxxxxxxx
 OPENCLAW_TOKEN=a-strong-random-string-use-openssl-rand-hex-32
 ANTHROPIC_API_KEY=sk-ant-your-actual-key-here
-TELEGRAM_BOT_TOKEN=123456789:ABCdefGHIjklMNOpqrsTUVwxyz
+TELEGRAM_BOT_TOKEN=<your-bot-token>
 ```
 
 Generate a strong gateway token:

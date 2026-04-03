@@ -4,10 +4,9 @@ data/workspace/memory/
 data/workspace/config/
 data/workspace/.openclaw/
 
-# Tailscale state
-tailscale/*.txt
-tailscale/*.conf
-tailscale/tailscaled.state
+# Tailscale state — exclude everything, keep only placeholder
+tailscale/*
+!tailscale/.gitkeep
 
 # Backups
 backups/

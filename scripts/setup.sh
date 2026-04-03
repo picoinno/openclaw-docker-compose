@@ -70,6 +70,7 @@ echo ""
 # Gateway token
 echo -e "${CYAN}--- Gateway Token ---${NC}"
 OPENCLAW_TOKEN=$(openssl rand -hex 32 2>/dev/null || head -c 64 /dev/urandom | xxd -p | tr -d '\n' | head -c 64)
+BROWSER_TOKEN=$(openssl rand -hex 32 2>/dev/null || head -c 64 /dev/urandom | xxd -p | tr -d '\n' | head -c 64)
 echo -e "Generated gateway token: ${GREEN}${OPENCLAW_TOKEN:0:16}...${NC} (saved to .env)"
 echo ""
 
@@ -86,10 +87,13 @@ echo "Create a bot via @BotFather on Telegram"
 read -rsp "Telegram bot token: " TELEGRAM_BOT_TOKEN
 echo ""
 
-# Validate Telegram token
+# Validate Telegram token (POST to avoid token in URL / process list)
 echo ""
 echo -n "Validating Telegram token... "
-TELEGRAM_RESPONSE=$(curl -s "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe" 2>/dev/null || echo '{"ok":false}')
+TELEGRAM_RESPONSE=$(curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -d "{\"chat_id\":\"\"}" \
+  "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getMe" 2>/dev/null || echo '{"ok":false}')
 
 if echo "$TELEGRAM_RESPONSE" | grep -q '"ok":true'; then
   BOT_USERNAME=$(echo "$TELEGRAM_RESPONSE" | grep -o '"username":"[^"]*"' | head -1 | cut -d'"' -f4)
@@ -108,6 +112,9 @@ TS_AUTHKEY=${TS_AUTHKEY}
 
 # OpenClaw Gateway
 OPENCLAW_TOKEN=${OPENCLAW_TOKEN}
+
+# Browser security token
+BROWSER_TOKEN=${BROWSER_TOKEN}
 
 # AI Provider
 ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}

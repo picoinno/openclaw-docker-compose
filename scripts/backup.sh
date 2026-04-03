@@ -16,6 +16,23 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 BACKUP_ROOT="${1:-${PROJECT_DIR}/backups}"
 
+# Validate backup path — must be absolute, non-empty, and not a dangerous root
+if [[ -z "$BACKUP_ROOT" ]]; then
+  echo "ERROR: Backup path is empty." >&2
+  exit 1
+fi
+if [[ "$BACKUP_ROOT" != /* ]]; then
+  echo "ERROR: Backup path must be absolute: $BACKUP_ROOT" >&2
+  exit 1
+fi
+# Block dangerous root-level paths
+for DANGEROUS in / /etc /usr /bin /sbin /lib /boot /sys /proc /dev /root /home; do
+  if [[ "$BACKUP_ROOT" == "$DANGEROUS" ]]; then
+    echo "ERROR: Refusing to use dangerous backup path: $BACKUP_ROOT" >&2
+    exit 1
+  fi
+done
+
 DATE=$(date +%Y-%m-%d_%H%M)
 BACKUP_DIR="${BACKUP_ROOT}/${DATE}"
 
@@ -24,6 +41,7 @@ log() { echo "[$(date -u +"%Y-%m-%d %H:%M:%S UTC")] $*"; }
 log "Starting backup..."
 log "Source: ${PROJECT_DIR}/data/"
 log "Target: ${BACKUP_DIR}/"
+log "⚠  Backup includes .env (secrets). Secure the backup destination."
 
 mkdir -p "$BACKUP_DIR"
 
