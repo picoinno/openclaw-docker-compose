@@ -83,6 +83,13 @@ services:
       - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN:-}
       # --- Optional: Gateway ---
       - OPENCLAW_LOG_LEVEL=${OPENCLAW_LOG_LEVEL:-info}
+      # --- Optional: GitHub ---
+      - GITHUB_TOKEN_PICOINNO=${GITHUB_TOKEN_PICOINNO:-}
+      - GITHUB_TOKEN_PICO_INNO=${GITHUB_TOKEN_PICO_INNO:-}
+      - GITHUB_TOKEN_MIJN_UI=${GITHUB_TOKEN_MIJN_UI:-}
+      - GITHUB_TOKEN_SANNKOKO=${GITHUB_TOKEN_SANNKOKO:-}
+      - GIT_USER_NAME=${GIT_USER_NAME:-OpenClaw Agent}
+      - GIT_USER_EMAIL=${GIT_USER_EMAIL:-agent@openclaw.ai}
     depends_on:
       tailscale:
         condition: service_healthy

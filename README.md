@@ -237,6 +237,25 @@ This stack ships with an optimized `openclaw.json.template` that enables:
 
 Run `./scripts/init-config.sh` after first boot to apply the template.
 
+## GitHub Access (optional)
+
+If you want the agent to push/pull GitHub repos, add your PAT tokens to `.env`:
+
+```env
+GITHUB_TOKEN_PICOINNO=github_pat_xxxxxxxxx
+GITHUB_TOKEN_PICO_INNO=github_pat_xxxxxxxxx
+```
+
+Then wire them into the container after first boot:
+
+```bash
+docker compose run --rm openclaw-cli bash /home/node/.openclaw/workspace/scripts/setup-github.sh
+```
+
+This writes tokens into `~/.git-credentials` inside the container — no credentials ever touch GitHub or your repo.
+
+> **Tokens stay in `.env` (gitignored). Never commit them.**
+
 ## Management
 
 ### View logs
