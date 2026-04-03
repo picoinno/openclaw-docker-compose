@@ -68,7 +68,11 @@
       "coding-agent": { "enabled": true },
       "summarize": { "enabled": true },
       "session-logs": { "enabled": true },
-      "deep-dive": { "enabled": true }
+      "deep-dive": { "enabled": true },
+      "finance": { "enabled": true },
+      "hr": { "enabled": true },
+      "marketing": { "enabled": true },
+      "project-mgmt": { "enabled": true }
     }
   }
 }

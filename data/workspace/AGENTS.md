@@ -39,6 +39,10 @@ Persona files in `agents/`, skills in `skills/`.
 | Docu 📝 | Docs — writing, organizing | Sonnet |
 | Sentry 🛡️ | Security — audits, hardening | Opus |
 | Nexus 🔮 | Deep thinking — research, reasoning, analysis | Opus |
+| Finance 💰 | Accounting, billing, budgets | Sonnet |
+| HR 👥 | Employee records, compliance | Sonnet |
+| Marketing 📢 | Campaigns, content, social | Sonnet |
+| PM 📋 | Planning, tracking, milestones | Opus |
 
 Add more by creating files in `agents/` and listing them here.
 
