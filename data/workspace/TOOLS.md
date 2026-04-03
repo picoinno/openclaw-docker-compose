@@ -2,18 +2,15 @@
 
 ## GitHub
 
-PAT tokens are passed via environment variables (set in `.env`, never committed).
-Wired into `~/.git-credentials` by running:
+PAT tokens are passed via env vars (`GITHUB_USERNAME_N` + `GITHUB_TOKEN_N` in `.env`).
+Run once to wire them into the container:
 
 ```bash
-docker compose run --rm openclaw-cli bash /home/node/.openclaw/workspace/scripts/setup-github.sh
+docker compose run --rm openclaw-cli bash \
+  /home/node/.openclaw/workspace/scripts/setup-github.sh
 ```
 
-Configured tokens (update after running setup-github.sh):
-- picoinno → personal account
-- pico-inno → org
-
-Other orgs (mijn-ui, sannkoko) → set `GITHUB_TOKEN_MIJN_UI` / `GITHUB_TOKEN_SANNKOKO` in `.env` and re-run script.
+Account details live in `GITHUB.md` (gitignored — copy from `GITHUB.md.example`).
 
 ---
 

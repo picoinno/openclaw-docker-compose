@@ -1,5 +1,8 @@
 # Memory files — personal, don't commit
 memory/
+
+# GitHub config — contains account names, never commit
+GITHUB.md
 *.sqlite
 
 # Secrets & credentials

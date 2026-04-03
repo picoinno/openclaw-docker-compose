@@ -1,0 +1,32 @@
+# GITHUB.md — GitHub Access Config
+#
+# Copy this file to GITHUB.md and fill in your values.
+# GITHUB.md is gitignored — it never gets committed.
+#
+# This is how the agent knows which accounts and repos it can access.
+# Update it after running scripts/setup-github.sh.
+
+## Accounts
+
+- **Account 1:** username=your-username, type=user
+- **Account 2:** username=your-org, type=org
+
+## Orgs & Repos
+
+- your-username → personal repos
+- your-org → org repos
+
+## Access Status
+
+- Account 1: ✅ token configured
+- Account 2: ✅ token configured
+
+## Red Lines
+
+- NEVER delete any repository. Ever.
+- Never force-push to main/master without explicit approval
+- Never expose tokens or credentials in commits or chat output
+
+## Notes
+
+_(Add anything the agent needs to know — e.g. which repos are active, branch conventions, etc.)_
