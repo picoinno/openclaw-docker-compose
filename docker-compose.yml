@@ -52,8 +52,8 @@ services:
       - NETWORKS=0
       - VOLUMES=0
       - POST=1
-    networks:
-      - socket-proxy
+    # Share tailscale network so gateway can reach proxy on localhost:2375
+    network_mode: "service:tailscale"
     security_opt:
       - no-new-privileges:true
     logging:
@@ -125,8 +125,6 @@ services:
       - GITHUB_TOKEN_3=${GITHUB_TOKEN_3:-}
       - GIT_USER_NAME=${GIT_USER_NAME:-OpenClaw Agent}
       - GIT_USER_EMAIL=${GIT_USER_EMAIL:-}
-    networks:
-      - socket-proxy
     depends_on:
       tailscale:
         condition: service_healthy
