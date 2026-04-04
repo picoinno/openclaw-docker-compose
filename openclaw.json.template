@@ -4,10 +4,10 @@
       "model": {
         "primary": "__AI_MODEL__",
         "fallbacks": [
-          "anthropic/claude-opus-4-6",
-          "openai/gpt-4.1",
-          "openrouter/google/gemini-2.5-pro",
-          "openrouter/qwen/qwen3.5-35b-a3b"
+          "anthropic/claude-sonnet-4-6",
+          "openai/gpt-4o",
+          "openrouter/minimax/minimax-m2.7",
+          "ollama/qwen2.5"
         ]
       },
       "compaction": {

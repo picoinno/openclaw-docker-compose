@@ -5,12 +5,21 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased]
+## [2026-04-04] — OpenRouter-first model chain
+
+### Why
+Anthropic pricing is expensive for a self-hosted stack where cost efficiency matters. OpenRouter gives access to 100+ models via a single API key. By making OpenRouter the default and keeping Anthropic/OpenAI as named fallbacks (plus a local Ollama option), users get the best price-to-performance ratio with full resilience.
 
 ### Changed
-- Switching default AI provider from Anthropic to OpenRouter
-- Replacing Anthropic fallback models with cost-efficient alternatives (Xiaomi MiMo, MiniMax, Qwen, Gemini)
-- Updating `.env.example` and `openclaw.json.template` to reflect OpenRouter-first setup
+- **Default primary model**: `openrouter/qwen/qwen-3.5-72b-instruct` (via OpenRouter) — replaces `anthropic/claude-sonnet-4-20250514`
+- **Fallback chain** (in order):
+  1. `openrouter/qwen/qwen-3.5-72b-instruct` — primary, fast + cost-efficient
+  2. `anthropic/claude-sonnet-4-6` — official Anthropic fallback
+  3. `openai/gpt-4o` — official OpenAI fallback
+  4. `openrouter/minimax/minimax-m2.7` — strong agent model via OpenRouter
+  5. `ollama/qwen2.5` — local fallback, zero API cost
+- **`.env.example`**: OpenRouter key is now uncommented and marked recommended; Anthropic/OpenAI keys moved to commented fallback section
+- **Ollama support**: added `OLLAMA_BASE_URL` config for local model fallback
 
 ---
 
