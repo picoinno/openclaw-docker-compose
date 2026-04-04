@@ -151,7 +151,7 @@ services:
 
   # --- BROWSER ENGINE ---
   openclaw-browser:
-    image: browserless/chrome:v2.25.2
+    image: browserless/chrome:latest
     container_name: openclaw-browser
     restart: unless-stopped
     # Shares Tailscale network so gateway can reach port 3000 on localhost
