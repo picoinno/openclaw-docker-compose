@@ -104,12 +104,15 @@ nano .env    # Fill in your actual values
 docker compose up -d
 ```
 
-### 4. Set your AI model
+### 4. Apply config (required)
 
-The default model is `openrouter/qwen/qwen-3.5-72b-instruct` via OpenRouter. To use a different model, either:
+Run this before starting — it writes `openclaw.json` with your chosen model so the gateway doesn't boot with a wrong default:
 
-- Set `AI_MODEL` in your `.env` before first boot, or
-- Run the init script after boot:
+```bash
+./scripts/init-config.sh
+```
+
+This reads `AI_MODEL` from your `.env` automatically. You can also pass a model directly:
 
 ```bash
 ./scripts/init-config.sh openrouter/google/gemini-2.5-flash
