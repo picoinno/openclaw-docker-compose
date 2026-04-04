@@ -1,6 +1,15 @@
 # OpenClaw Stack
 
-A self-hosted AI assistant running on Docker with Tailscale networking, connected via Telegram.
+A production-ready, self-hosted AI assistant running on Docker with Tailscale networking and Telegram. Designed for cost efficiency, resilience, and real-world use.
+
+## Why This Stack?
+
+- **💸 Cost-efficient** — OpenRouter as default provider, access 100+ models via one API key at the best price-to-performance ratio
+- **🔄 Resilient** — 5-level fallback chain: OpenRouter → Anthropic → OpenAI → MiniMax → Ollama (local). If one provider goes down, the next picks up automatically
+- **🧠 Organized** — Specialized sub-agents for coding, research, security, CRM, and more — not one overloaded AI trying to do everything
+- **⚡ Optimized** — 56% reduction in per-prompt token overhead through context pruning, memory flush, and image downscaling
+- **🔒 Hardened** — Resource limits, healthchecks, log rotation, socket proxy, auth tokens, no secrets in the repo
+- **🚀 One command** — `docker compose up -d` and you're running
 
 ## What's Inside
 
@@ -24,18 +33,35 @@ A self-hosted AI assistant running on Docker with Tailscale networking, connecte
 │  └──────┬────────┘  └───────────┘  └──────────────┘ │
 │         │                                           │
 │         ├──→ Telegram API (outbound)                │
-│         ├──→ Anthropic API (outbound)               │
+│         ├──→ AI Providers (OpenRouter/Anthropic/    │
+│         │    OpenAI/Ollama — auto-failover)         │
 │         └──→ Browser on localhost:3000              │
 └─────────────────────────────────────────────────────┘
 ```
 
 All services share the Tailscale network stack, so they see each other on `localhost`.
 
+## Model Chain
+
+This stack uses a 5-level fallback chain — if the primary model is unavailable, the next one picks up automatically:
+
+| # | Model | Provider | Cost (in/out per 1M tokens) |
+|---|-------|----------|----------------------------|
+| 🟢 Primary | Qwen 3.5 72B | OpenRouter | ~$0.30 / $0.90 |
+| 1️⃣ Fallback | Claude Sonnet 4 | Anthropic (direct) | $3.00 / $15.00 |
+| 2️⃣ Fallback | GPT-4o | OpenAI (direct) | $2.50 / $10.00 |
+| 3️⃣ Fallback | MiniMax M2.7 | OpenRouter | $0.30 / $1.20 |
+| 4️⃣ Fallback | Qwen 2.5 | Ollama (local) | Free |
+
+> **Only `OPENROUTER_API_KEY` is required to get started.** Anthropic/OpenAI keys are optional for their respective fallbacks. Ollama needs no key — just a running instance on your network.
+
+You can swap any model by editing `AI_MODEL` in `.env` and the fallback list in `openclaw.json.template`.
+
 ## Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) + Docker Compose v2
 - A [Tailscale](https://tailscale.com/) account + auth key (see below)
-- An [Anthropic API key](https://console.anthropic.com/settings/keys) (or OpenAI)
+- An [OpenRouter API key](https://openrouter.ai/keys) (or any other AI provider)
 - A [Telegram bot token](https://core.telegram.org/bots#botfather) from @BotFather
 
 ### Tailscale Account
@@ -80,15 +106,21 @@ docker compose up -d
 
 ### 4. Set your AI model
 
-The gateway defaults to Anthropic Claude. If you're using a different provider (OpenAI, etc.), run this after first boot:
+The default model is `openrouter/qwen/qwen-3.5-72b-instruct` via OpenRouter. To use a different model, either:
+
+- Set `AI_MODEL` in your `.env` before first boot, or
+- Run the init script after boot:
 
 ```bash
-./scripts/init-config.sh openai/gpt-4o
+./scripts/init-config.sh openrouter/google/gemini-2.5-flash
 ```
 
-Or set `AI_MODEL` in your `.env` and run `./scripts/init-config.sh` without arguments.
-
-Common models: `anthropic/claude-sonnet-4-20250514`, `openai/gpt-4o`, `openai/gpt-4o-mini`, `ollama/llama3`
+Popular choices:
+- `openrouter/qwen/qwen-3.5-72b-instruct` — default, great price/performance
+- `openrouter/google/gemini-2.5-flash` — fast and cheap
+- `openrouter/minimax/minimax-m2.7` — strong agent model
+- `openai/gpt-4o` — OpenAI direct
+- `ollama/qwen2.5` — local, free
 
 > **Why?** OpenClaw stores the model in `openclaw.json`, not `.env`. This script bridges the gap so you only edit `.env`.
 
@@ -214,12 +246,21 @@ Keeping repos out of the workspace prevents accidental context bloat.
 
 ### Subagents
 
-Three starter subagents are included in `data/workspace/agents/`:
-- **Koda 💻** — coding, debugging, reviews
-- **Docu 📝** — documentation, writing
-- **Sentry 🛡️** — security audits, hardening
+The stack ships with a full team of specialized agents in `data/workspace/agents/`:
 
-Add more by creating files in `agents/` and listing them in `AGENTS.md`.
+| Agent | Role |
+|-------|------|
+| 💻 **Koda** | Coding, debugging, code review |
+| 📝 **Docu** | Documentation, writing, organizing |
+| 🛡️ **Sentry** | Security audits, hardening |
+| 🔮 **Nexus** | Deep research, reasoning, analysis |
+| 🤝 **CRM** | Prospects, pipeline, client management |
+| 💰 **Finance** | Accounting, billing, budgets |
+| 👥 **HR** | Employee records, compliance |
+| 📢 **Marketing** | Campaigns, content, social media |
+| 📋 **PM** | Planning, tracking, milestones |
+
+Each agent has its own persona file with specialized instructions. The main agent delegates tasks automatically. Add more by creating files in `agents/` and listing them in `AGENTS.md`.
 
 ## Token Optimization
 
@@ -317,11 +358,14 @@ Or switch manually:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
+| `OPENROUTER_API_KEY` | Yes* | OpenRouter API key — access 100+ models (*or any other provider key) |
+| `OPENCLAW_TOKEN` | Yes | Gateway auth token (for Control UI) |
+| `TELEGRAM_BOT_TOKEN` | Yes | Telegram bot token from @BotFather |
 | `TS_AUTHKEY` | Yes | Tailscale auth key for VPN connectivity |
 | `TS_HOSTNAME` | No | Tailscale machine name (default: `openclaw-agent`). Used as the URL to access Control UI: `http://<hostname>:18789` |
-| `OPENCLAW_TOKEN` | Yes | Gateway auth token (for Control UI) |
-| `ANTHROPIC_API_KEY` | Yes* | Anthropic API key (*or any other AI provider key) |
-| `TELEGRAM_BOT_TOKEN` | Yes | Telegram bot token from @BotFather |
+| `ANTHROPIC_API_KEY` | No | Anthropic key — enables Claude fallback |
+| `OPENAI_API_KEY` | No | OpenAI key — enables GPT fallback |
+| `OLLAMA_BASE_URL` | No | Ollama endpoint — enables local model fallback (no key needed) |
 
 ## Security Notes
 
@@ -333,7 +377,8 @@ Or switch manually:
 
 ## Data & Privacy
 
-- AI conversations go to your AI provider (Anthropic/OpenAI) via **API** — [not used for training](https://docs.anthropic.com/en/docs/resources/data-usage)
+- AI conversations go to your AI provider(s) via **API** — not used for training ([Anthropic](https://docs.anthropic.com/en/docs/resources/data-usage), [OpenAI](https://platform.openai.com/docs/models#how-we-use-your-data), [OpenRouter](https://openrouter.ai/privacy))
+- With Ollama fallback, conversations can stay fully local on your hardware
 - All config and session data stays on your machine
 - OpenClaw is open source with no telemetry
 
