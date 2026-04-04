@@ -64,7 +64,7 @@ services:
 
   # --- CORE ENGINE ---
   openclaw-gateway:
-    image: ghcr.io/openclaw/openclaw:2026.3.13
+    image: ghcr.io/openclaw/openclaw:2026.4.2-slim
     container_name: openclaw-gateway
     restart: unless-stopped
     stop_grace_period: 30s
@@ -182,7 +182,7 @@ services:
 
   # --- MANAGEMENT TOOL ---
   openclaw-cli:
-    image: ghcr.io/openclaw/openclaw:2026.3.13
+    image: ghcr.io/openclaw/openclaw:2026.4.2-slim
     container_name: openclaw-cli
     security_opt:
       - no-new-privileges:true
