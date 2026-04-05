@@ -5,6 +5,7 @@
 - Agent first boot: _(date)_
 
 ## Decisions
+- MyanClaw fallback chain: openrouter/qwen/qwen3.6-plus:free → openrouter/xiaomi/mimo-v2-pro → openrouter/google/gemini-2.5-flash → anthropic/claude-sonnet-4.6 → openai/gpt-5.4 → ollama/qwen3.5-9B
 - Projects in `/home/node/projects/`, not workspace
 - _(Add important decisions here)_
 
