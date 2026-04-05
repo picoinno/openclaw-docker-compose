@@ -1,26 +1,3 @@
-# Runtime data — never commit
-data/.openclaw/
-data/workspace/memory/
-data/workspace/config/
-data/workspace/.openclaw/
 
-# Tailscale state — exclude everything, keep only placeholder
-tailscale/*
-!tailscale/.gitkeep
-
-# Backups
-backups/
-
-# Secrets
+# Ignore environment files
 .env
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Editor
-*.swp
-*.swo
-*~
-.vscode/
-.idea/
